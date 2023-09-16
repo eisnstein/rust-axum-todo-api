@@ -1,0 +1,9 @@
+services:
+  db:
+    image: postgres:15.3-alpine3.18
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: axum_dev
+    ports:
+      - "5432:5432"
