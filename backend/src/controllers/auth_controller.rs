@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{
     extract::{Json, State},
     response::IntoResponse,
@@ -11,7 +13,7 @@ use validator::Validate;
 use crate::services::{jwt_service, password_service, user_service};
 
 pub async fn authenticate(
-    State(db): State<PgPool>,
+    State(db): State<Arc<PgPool>>,
     Json(req): Json<AuthenticateRequest>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<ErrorResponse>)> {
     if let Err(err) = req.validate() {

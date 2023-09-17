@@ -7,7 +7,7 @@ use validator::{Validate, ValidationErrors};
 pub type UserId = i32;
 pub type TodoId = i32;
 
-#[derive(Deserialize, Serialize, Debug, FromRow)]
+#[derive(Deserialize, Serialize, Debug, FromRow, Clone)]
 #[allow(non_snake_case)]
 pub struct User {
     pub id: UserId,

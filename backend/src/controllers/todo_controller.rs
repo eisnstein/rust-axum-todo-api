@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{
     extract::{Json, Path, State},
     response::IntoResponse,
@@ -11,8 +13,8 @@ use sqlx::PgPool;
 use crate::services::todo_service;
 
 pub async fn get_todos(
-    // Extension(user): Extension<User>,
-    State(db): State<PgPool>,
+    State(db): State<Arc<PgPool>>,
+    Extension(user): Extension<User>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<ErrorResponse>)> {
     let todo: Result<Todo, _> = Ok::<Todo, anyhow::Error>(Todo {
         id: 1,
@@ -32,8 +34,8 @@ pub async fn get_todos(
 }
 
 pub async fn get_todo(
-    //Extension(user): Extension<User>,
-    State(db): State<PgPool>,
+    Extension(user): Extension<User>,
+    State(db): State<Arc<PgPool>>,
     Path(todo_id): Path<i32>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<ErrorResponse>)> {
     let todo: Result<Todo, _> = Ok::<Todo, anyhow::Error>(Todo {

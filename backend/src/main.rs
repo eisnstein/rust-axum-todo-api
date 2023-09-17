@@ -2,12 +2,10 @@ use std::error::Error;
 use std::{env, sync::Arc};
 
 use axum::{
-    extract::Extension,
     middleware,
     routing::{get, post},
     Router,
 };
-use common::User;
 use hyper::Server;
 use sqlx::postgres::PgPoolOptions;
 use tracing::Level;
@@ -47,29 +45,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // sqlx::migrate!().run(&pool).await?;
 
     let user_routes = Router::new()
-        .route(
-            "/",
-            get(user_controller::get_users)
-                .route_layer(middleware::from_fn_with_state(pool.clone(), auth)),
-        )
-        .route(
-            "/:user_id",
-            get(user_controller::get_user)
-                .route_layer(middleware::from_fn_with_state(pool.clone(), auth)),
-        )
+        .route("/", get(user_controller::get_users))
+        .route("/:user_id", get(user_controller::get_user))
+        .route_layer(middleware::from_fn_with_state(pool.clone(), auth))
         .route("/", post(user_controller::post_create_user));
 
     let todo_routes = Router::new()
-        .route(
-            "/",
-            get(todo_controller::get_todos)
-                .route_layer(middleware::from_fn_with_state(pool.clone(), auth)),
-        )
-        .route(
-            "/:todo_id",
-            get(todo_controller::get_todo)
-                .route_layer(middleware::from_fn_with_state(pool.clone(), auth)),
-        );
+        .route("/", get(todo_controller::get_todos))
+        .route("/:todo_id", get(todo_controller::get_todo))
+        .route_layer(middleware::from_fn_with_state(pool.clone(), auth));
 
     let auth_routes = Router::new().route("/token", post(auth_controller::authenticate));
 
@@ -78,8 +62,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .nest("/todos", todo_routes)
         .nest("/auth", auth_routes);
 
-    let router = Router::new().nest("/api/v1", api_routes);
-    //.layer(Extension(pool.clone()));
+    let router = Router::new().nest("/api/v1", api_routes).with_state(pool);
 
     let addr = "127.0.0.1:3000".parse()?;
     let server = Server::bind(&addr).serve(router.into_make_service());

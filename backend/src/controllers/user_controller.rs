@@ -1,6 +1,10 @@
+use std::sync::Arc;
+
 use axum::{
+    debug_handler,
     extract::{Json, Path, State},
     response::IntoResponse,
+    Extension,
 };
 use common::{CreateUserRequest, ErrorResponse, User};
 use hyper::StatusCode;
@@ -11,7 +15,8 @@ use validator::Validate;
 use crate::services::user_service;
 
 pub async fn get_users(
-    State(db): State<PgPool>,
+    Extension(user): Extension<User>,
+    State(db): State<Arc<PgPool>>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<ErrorResponse>)> {
     match user_service::get_all_users(&db).await {
         Ok(users) => Ok((
@@ -27,7 +32,7 @@ pub async fn get_users(
 }
 
 pub async fn get_user(
-    State(db): State<PgPool>,
+    State(db): State<Arc<PgPool>>,
     Path(user_id): Path<i32>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<ErrorResponse>)> {
     match user_service::get_user_by_id(&db, user_id).await {
@@ -46,7 +51,7 @@ pub async fn get_user(
 }
 
 pub async fn post_create_user(
-    State(db): State<PgPool>,
+    State(db): State<Arc<PgPool>>,
     Json(req): Json<CreateUserRequest>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<ErrorResponse>)> {
     if let Err(err) = req.validate() {
