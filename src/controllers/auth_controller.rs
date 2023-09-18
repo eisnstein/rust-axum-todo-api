@@ -4,13 +4,15 @@ use axum::{
     extract::{Json, State},
     response::IntoResponse,
 };
-use common::{AuthenticateRequest, ErrorResponse};
 use hyper::StatusCode;
 use serde_json::json;
 use sqlx::PgPool;
 use validator::Validate;
 
-use crate::services::{jwt_service, password_service, user_service};
+use crate::{
+    models::{error::ErrorResponse, user::AuthenticateRequest},
+    services::{jwt_service, password_service, user_service},
+};
 
 pub async fn authenticate(
     State(db): State<Arc<PgPool>>,

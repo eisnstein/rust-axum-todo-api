@@ -1,18 +1,22 @@
 use std::sync::Arc;
 
 use axum::{
-    debug_handler,
     extract::{Json, Path, State},
     response::IntoResponse,
     Extension,
 };
-use common::{CreateUserRequest, ErrorResponse, User};
 use hyper::StatusCode;
 use serde_json::json;
 use sqlx::PgPool;
 use validator::Validate;
 
-use crate::services::user_service;
+use crate::{
+    models::{
+        error::ErrorResponse,
+        user::{CreateUserRequest, User},
+    },
+    services::user_service,
+};
 
 pub async fn get_users(
     Extension(user): Extension<User>,
@@ -50,7 +54,7 @@ pub async fn get_user(
     }
 }
 
-pub async fn post_create_user(
+pub async fn store_user(
     State(db): State<Arc<PgPool>>,
     Json(req): Json<CreateUserRequest>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<ErrorResponse>)> {

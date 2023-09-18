@@ -12,6 +12,7 @@ use tracing::Level;
 
 pub mod controllers;
 pub mod middlewares;
+pub mod models;
 pub mod services;
 
 use controllers::{auth_controller, todo_controller, user_controller};
@@ -48,11 +49,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .route("/", get(user_controller::get_users))
         .route("/:user_id", get(user_controller::get_user))
         .route_layer(middleware::from_fn_with_state(pool.clone(), auth))
-        .route("/", post(user_controller::post_create_user));
+        .route("/", post(user_controller::store_user));
 
     let todo_routes = Router::new()
         .route("/", get(todo_controller::get_todos))
         .route("/:todo_id", get(todo_controller::get_todo))
+        .route("/", post(todo_controller::store_todo))
         .route_layer(middleware::from_fn_with_state(pool.clone(), auth));
 
     let auth_routes = Router::new().route("/token", post(auth_controller::authenticate));

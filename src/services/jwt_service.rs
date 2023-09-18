@@ -1,11 +1,12 @@
+use std::env;
 use std::ops::Add;
-use std::{any, env};
 
 use anyhow::{anyhow, Context, Result};
 use chrono::{Days, Utc};
-use common::{Claims, User};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use tokio::task;
+
+use crate::models::user::{Claims, User};
 
 pub async fn create(user: &User) -> Result<String> {
     let user_id = user.id;

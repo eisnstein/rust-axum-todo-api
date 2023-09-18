@@ -1,8 +1,10 @@
 use anyhow::Result;
-use common::{CreateUserRequest, User};
 use sqlx::{PgPool, Row};
 
-use crate::services::password_service;
+use crate::{
+    models::user::{CreateUserRequest, User, UserId},
+    services::password_service,
+};
 
 use super::jwt_service;
 
@@ -29,7 +31,7 @@ pub async fn get_user_by_email(db: &PgPool, email: String) -> Result<User> {
         .map_err(|err| anyhow::anyhow!(err))
 }
 
-pub async fn register(db: &PgPool, user_data: CreateUserRequest) -> Result<i32> {
+pub async fn register(db: &PgPool, user_data: CreateUserRequest) -> Result<UserId> {
     let password_hash = password_service::generate_password_hash(user_data.password).await?;
 
     let result =
@@ -41,7 +43,7 @@ pub async fn register(db: &PgPool, user_data: CreateUserRequest) -> Result<i32> 
             .map_err(|err| anyhow::anyhow!(err));
 
     match result {
-        Ok(row) => Ok(row.get::<i32, _>(0)),
+        Ok(row) => Ok(row.get::<UserId, _>(0)),
         Err(e) => Err(e),
     }
 }
