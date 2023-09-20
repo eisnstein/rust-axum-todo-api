@@ -55,6 +55,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .route("/", get(todo_controller::get_todos))
         .route("/:todo_id", get(todo_controller::get_todo))
         .route("/", post(todo_controller::store_todo))
+        .route("/:todo_id", post(todo_controller::update_todo))
         .route_layer(middleware::from_fn_with_state(pool.clone(), auth));
 
     let auth_routes = Router::new().route("/token", post(auth_controller::authenticate));

@@ -11,7 +11,11 @@ use sqlx::PgPool;
 use validator::Validate;
 
 use crate::{
-    models::{error::ErrorResponse, todo::CreateTodoRequest, user::User},
+    models::{
+        error::ErrorResponse,
+        todo::{CreateTodoRequest, UpdateTodoRequest},
+        user::User,
+    },
     services::todo_service,
 };
 
@@ -63,6 +67,25 @@ pub async fn store_todo(
     match todo_service::create_todo(&db, todo_data, user.id).await {
         Ok(todo_id) => Ok((
             StatusCode::CREATED,
+            [("location", format!("/api/v1/todos/{todo_id}",))],
+        )),
+        Err(err) => {
+            let err_response =
+                ErrorResponse::new("error", &format!("Could not create todo: {:?}", err), None);
+            Err((StatusCode::INTERNAL_SERVER_ERROR, Json(err_response)))
+        }
+    }
+}
+
+pub async fn update_todo(
+    Extension(user): Extension<User>,
+    State(db): State<Arc<PgPool>>,
+    Path(todo_id): Path<i32>,
+    Json(todo_data): Json<UpdateTodoRequest>,
+) -> Result<impl IntoResponse, (StatusCode, Json<ErrorResponse>)> {
+    match todo_service::update_todo(&db, todo_data, todo_id, user.id).await {
+        Ok(()) => Ok((
+            StatusCode::OK,
             [("location", format!("/api/v1/todos/{todo_id}",))],
         )),
         Err(err) => {

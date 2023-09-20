@@ -17,3 +17,14 @@ Content-Type: application/json
 {
   "todo": "new todo"
 }
+
+### Update todo
+
+POST http://localhost:3000/api/v1/todos/1
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjE3LCJleHAiOjE2OTczMTA4NDZ9.m9lbPucjDEbGbneODJRWTXhcrgncC-2AZ0ti_b5Qu8M
+Content-Type: application/json
+
+{
+  "todo": "updated",
+  "is_completed": true
+}
