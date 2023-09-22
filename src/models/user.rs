@@ -1,8 +1,6 @@
-use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
 use sqlx::{types::chrono, FromRow};
-use validator::{Validate, ValidationErrors};
+use validator::Validate;
 
 pub type UserId = i32;
 
@@ -12,6 +10,7 @@ pub struct User {
     pub id: UserId,
     pub email: String,
     pub password_hash: String,
+    pub is_admin: bool,
     #[serde(rename = "updateAt")]
     pub updated_at: Option<chrono::NaiveDateTime>,
     #[serde(rename = "createdAt")]

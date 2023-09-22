@@ -16,6 +16,7 @@ pub mod models;
 pub mod services;
 
 use controllers::{auth_controller, todo_controller, user_controller};
+use middlewares::admin_middlware::admin;
 use middlewares::auth_middlware::auth;
 
 #[tokio::main]
@@ -48,6 +49,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let user_routes = Router::new()
         .route("/", get(user_controller::get_users))
         .route("/:user_id", get(user_controller::get_user))
+        .route_layer(middleware::from_fn(admin))
         .route_layer(middleware::from_fn_with_state(pool.clone(), auth))
         .route("/", post(user_controller::store_user));
 

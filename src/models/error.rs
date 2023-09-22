@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
-use serde::{Deserialize, Serialize};
-use sqlx::{types::chrono, FromRow};
-use validator::{Validate, ValidationErrors};
+use serde::Serialize;
+use validator::ValidationErrors;
 
 #[derive(Serialize, Debug)]
 pub struct ErrorResponse {
